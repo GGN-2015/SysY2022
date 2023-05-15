@@ -11,7 +11,7 @@ y.tab.c: ${YACC_FILE}
 lex.yy.c: ${INPUT_FILE}
 	lex ${LEX_FILE}
 
-run: ${OUT_FILE}
+run: ${OUTPUT_FILE}
 	./${OUT_FILE}
 
 clean:

@@ -1,12 +1,12 @@
-OUTPUT_FILE=example
-INPUT_FILE=example.l
+OUT_FILE=example
+IN_FILE=example.l
 
-example1: lex.yy.c
-	cc lex.yy.c -o ${OUTPUT_FILE} -ll
-lex.yy.c: ${INPUT_FILE}
-	lex ${INPUT_FILE}
-run: ${OUTPUT_FILE}
-	./${OUTPUT_FILE}
+${OUT_FILE}: lex.yy.c
+	cc lex.yy.c -o ${OUT_FILE} -ll
+lex.yy.c: ${IN_FILE}
+	lex ${IN_FILE}
+run: ${OUT_FILE}
+	./${OUT_FILE}
 clean:
-	rm ${OUTPUT_FILE} lex.yy.c
+	rm ${OUT_FILE} lex.yy.c
 .PHONY: run clean
