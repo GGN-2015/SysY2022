@@ -1,7 +1,7 @@
 %{
 #include <stdio.h>
 
-#define YYSTYPE char*
+#define YYSTYPE int
 extern YYSTYPE yylval; // put it before "y.tab.h"
 
 #include "y.tab.h"
@@ -14,6 +14,6 @@ extern YYSTYPE yylval; // put it before "y.tab.h"
 \*                            return MUL;
 \+                            return ADD;
 \/                            return DIV;
-\(                            return OPARA;
-\)                            return EPARA;
+\(                            return OPARE;
+\)                            return EPARE;
 %%
