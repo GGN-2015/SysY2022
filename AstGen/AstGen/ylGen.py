@@ -205,10 +205,7 @@ def __test__ylGen():
     """
     (lex, yacc), flag = ylGen(correctText)
     assert flag == ""
-    print(lex, yacc)
-
-    (lex, yacc), flag = ylGen(r"%syntax AddExp := NUM")
-    assert flag == "Syntax Uses Undefined Token"
+    # print(lex, yacc)
 
     (lex, yacc), flag = ylGen(r"%token num [0-9]+")
     assert flag == "Token Name Unavailable"
@@ -216,6 +213,14 @@ def __test__ylGen():
     (lex, yacc), flag = ylGen("%token NUM [0-9]+ \n %token NUM [0-9]+\.[0-9]*")
     assert flag == "Token Name Duplicated"
     
+    (lex, yacc), flag = ylGen(r"%syntax ADD_EXP :=")
+    assert flag == "Syntax Name Unavailable"
+    
+    (lex, yacc), flag = ylGen(r"%syntax $aaADD_EXP :=")
+    assert flag == "Syntax Name Unavailable"
+
+    (lex, yacc), flag = ylGen(r"%syntax AddExp := NUM")
+    assert flag == "Syntax Uses Undefined Token"
 
 # 自动化测试
 def __test():
