@@ -94,7 +94,7 @@ def __getLexText(lexData):
     maxRELen   = max([len(lexData[name]) for name in lexData]) + 1
     text = ""
     for name in lexData:
-        newLine = RND_FLAG_1 + r' { yylval = ++ nid; printf("%10d ' + RND_FLAG_2 + ' %s : ; \\n", nid, yytext) return ' + RND_FLAG_2 + ' ; }'
+        newLine = RND_FLAG_1 + r' { yylval = ++ nid; printf("%10d ' + RND_FLAG_2 + ' %s : ; \\n", nid, yytext); return ' + RND_FLAG_2 + ' ; }'
         newLine = newLine.replace(RND_FLAG_1, __fill(lexData[name], -maxRELen))
         newLine = newLine.replace(RND_FLAG_2, __fill(name,        -maxNameLen))
         text   += newLine + "\n"
@@ -180,11 +180,7 @@ def ylGen(text):
     return (__getLexText(lexData), 
             __getYaccText(lexData, yaccData)), "" # No Error
 
-# 自动化测试
-def __test():
-    __test__tokenNameCheck()
-    __test__syntaxNameCheck()
-
+def __test__ylGen():
     correctText = r"""
         %token  NUM   [0-9]+
         %token  LPARE \(
@@ -210,6 +206,22 @@ def __test():
     (lex, yacc), flag = ylGen(correctText)
     assert flag == ""
     print(lex, yacc)
+
+    (lex, yacc), flag = ylGen(r"%syntax AddExp := NUM")
+    assert flag == "Syntax Uses Undefined Token"
+
+    (lex, yacc), flag = ylGen(r"%token num [0-9]+")
+    assert flag == "Token Name Unavailable"
+
+    (lex, yacc), flag = ylGen("%token NUM [0-9]+ \n %token NUM [0-9]+\.[0-9]*")
+    assert flag == "Token Name Duplicated"
+    
+
+# 自动化测试
+def __test():
+    __test__tokenNameCheck()
+    __test__syntaxNameCheck()
+    __test__ylGen()
 
     print(__file__, "[PASSED]")
 
