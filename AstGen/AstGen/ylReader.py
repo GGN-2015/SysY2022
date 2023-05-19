@@ -9,11 +9,11 @@ def __matchPre(s: str, template: str):
     return s[:len(template)] == template
 
 def __parseToken(line):
-    lis = [x for x in line.split(" ", TOKEN_DEFINE_LEN) if x != ""]
+    lis = [x.strip() for x in line.split(" ", TOKEN_DEFINE_LEN) if x.strip() != ""]
     return lis
 
 def __parseSyntax(line):
-    lis = [x for x in line.split() if x != ""]
+    lis = [x.strip() for x in line.split() if x.strip() != ""]
     return lis
 
 # ans, flag = ylReader(text)
@@ -76,4 +76,5 @@ def __test():
 
     print(__file__, "[PASSED]")
 
-__test()
+if __name__ == "__main__":
+    __test()
