@@ -1,0 +1,20 @@
+%token NUM [0-9]*
+%token ADD \+
+%token SUB \-
+%token MUL \*
+%token DIV \/
+%token LPR \(
+%token EPR \)
+
+%syntax Exp    := AddExp
+
+%syntax AddExp := MulExp
+%syntax AddExp := AddExp ADD MulExp
+%syntax AddExp := AddExp SUB MulExp
+
+%syntax MulExp := PrExp
+%syntax MulExp := MulExp MUL PrExp
+%syntax MulExp := MulExp DIV PrExp
+
+%syntax PrExp  := NUM
+%syntax PrExp  := LPR AddExp RPR
