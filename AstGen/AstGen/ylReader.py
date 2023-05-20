@@ -10,7 +10,17 @@ def __matchPre(s: str, template: str):
     return s[:len(template)] == template
 
 def __parseToken(line):
-    lis = [x.strip() for x in line.split() if x.strip() != ""]
+    lis = []
+    while line != "" and len(lis) < TOKEN_DEFINE_LEN - 1:
+        try:
+            left, right = line.strip().split(" ", 1)
+        except:
+            break
+        left  = left.strip()
+        right = right.strip()
+        if left != "": lis.append(left)
+        line = right
+    if line.strip() != "": lis.append(line)
     return lis
 
 def __parseSyntax(line):

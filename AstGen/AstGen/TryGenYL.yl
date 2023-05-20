@@ -9,6 +9,9 @@
 %keyword KEYWORD_BREAK    break
 %keyword KEYWORD_RETURN   return
 
+%token KEYWORD_INT_FUNC   int/[ \t]*[_a-zA-z0-9]+\(
+%token KEYWORD_FLOAT_FUNC float/[ \t]*[_a-zA-z0-9]+\(
+
 %token SEMICOLON   \;
 %token COMMA       \,
 %token EQUAL       \=
@@ -63,7 +66,8 @@
 %syntax FuncDef        := FuncType IDENTIFIER LPARE             RPARE Block
 %syntax FuncDef        := FuncType IDENTIFIER LPARE FuncFParams RPARE Block 
 %syntax FuncType       := KEYWORD_VOID
-%syntax FuncType       := BType
+%syntax FuncType       := KEYWORD_INT_FUNC
+%syntax FuncType       := KEYWORD_FLOAT_FUNC
 %syntax FuncFParams    := FuncFParam
 %syntax FuncFParams    := FuncFParams COMMA FuncFParam
 %syntax FuncFParam     := BType IDENTIFIER FuncFParamArrayIndexList
