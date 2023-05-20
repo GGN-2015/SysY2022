@@ -85,13 +85,13 @@ VarDef: IDENTIFIER ArrayIndexList
 
 ### 3. FuncDef 函数定义
 
-`LPARA` 和 `RPARA` 分别表示左圆括号和右圆括号。
+`LPARE` 和 `RPARE` 分别表示左圆括号和右圆括号。
 
 ```c
 // 函数定义
 // 例如：float f(int x, float y) { return x + y; }
-FuncDef: FuncType IDENTIFIER LPARA             RPARA Block
-       | FuncType IDENTIFIER LPARA FuncFParams RPARA Block 
+FuncDef: FuncType IDENTIFIER LPARE             RPARE Block
+       | FuncType IDENTIFIER LPARE FuncFParams RPARE Block 
 
 // 函数返回值类型：void, int, float
 FuncType: KEYWORD_VOID
@@ -136,9 +136,9 @@ BlockItem: Decl
 // 例如：return 0;
 Stmt: LVal EQUAL Exp SEMICOLON
     | Block
-    | KEYWORD_IF           LPARA Cond RPARA Stmt
-    | KEYWORD_IF           LPARA Cond RPARA Stmt KEYWORD_ELSE Stmt
-    | KEYWORD_WHILE        LPARA Cond RPARA Stmt
+    | KEYWORD_IF           LPARE Cond RPARE Stmt
+    | KEYWORD_IF           LPARE Cond RPARE Stmt KEYWORD_ELSE Stmt
+    | KEYWORD_WHILE        LPARE Cond RPARE Stmt
     | KEYWORD_BREAK        SEMICOLON
     | KEYWORD_CONTINUE     SEMICOLON
     | KEYWORD_RETURN       SEMICOLON
@@ -164,7 +164,7 @@ LVal: IDENTIFIER ArrayIndexList
 
 // 基本表达式
 // 例如：(x + y)
-PrimaryExp: LPARA Exp RPARA
+PrimaryExp: LPARE Exp RPARE
           | LVal
           | Number
 
@@ -176,14 +176,20 @@ Number: INT_CONST
 // 单目运算表达式
 // 例如：-x
 UnaryExp: PrimaryExp
-        | IDENTIFIER LPARA             RPARA
-        | IDENTIFIER LPARA FuncRParams RPARA
+        | IDENTIFIER LPARE             RPARE
+        | IDENTIFIER LPARE FuncRPAREms RPARE
         | UnaryOp    UnaryExp
+
+// 单目运算符
+// 例如：!
+UnaryOp: OPE_ADD
+       | OPE_SUB
+       | OPE_NOT
 
 // 函数实参列表（非空）
 // 例如：x, y[2]
-FuncRParams: Exp
-           | FuncRParams Exp
+FuncRPAREms: Exp
+           | FuncRPAREms COMMA Exp
 
 // 乘除模表达式
 // 例如：x * (y + z) % 5
