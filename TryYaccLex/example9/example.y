@@ -25,36 +25,18 @@ int main() {
 }
 %}
 
-%token NUM LPARE RPARE ADD SUB MUL DIV 
+%token EQUAL IDENTIFIER KEYWORD_INT KEYWORD_FLOAT
 %%
-Exp
-    : AddExp 
-        { $$ = ++ nid; printf("%10d Exp @format AddExp  :  %d  ; \n", nid, $1 ); }
+VarDefine
+    : BType IDENTIFIER EQUAL IDENTIFIER
+        { $$ = ++ nid; printf("%10d VarDefine @format BType IDENTIFIER EQUAL IDENTIFIER  :  %d  %d  %d  %d  ; \n", nid, $1, $2, $3, $4 ); }   
 ;
 
-AddExp
-    : MulExp 
-        { $$ = ++ nid; printf("%10d AddExp @format MulExp  :  %d  ; \n", nid, $1 ); }
-    | AddExp ADD MulExp
-        { $$ = ++ nid; printf("%10d AddExp @format AddExp ADD MulExp  :  %d  %d  %d  ; \n", nid, $1, $2, $3 ); }
-    | AddExp SUB MulExp
-        { $$ = ++ nid; printf("%10d AddExp @format AddExp SUB MulExp  :  %d  %d  %d  ; \n", nid, $1, $2, $3 ); }
-;
-
-MulExp
-    : PrExp
-        { $$ = ++ nid; printf("%10d MulExp @format PrExp  :  %d  ; \n", nid, $1 ); }
-    | MulExp MUL PrExp
-        { $$ = ++ nid; printf("%10d MulExp @format MulExp MUL PrExp  :  %d  %d  %d  ; \n", nid, $1, $2, $3 ); }
-    | MulExp DIV PrExp
-        { $$ = ++ nid; printf("%10d MulExp @format MulExp DIV PrExp  :  %d  %d  %d  ; \n", nid, $1, $2, $3 ); }
-;
-
-PrExp
-    : NUM
-        { $$ = ++ nid; printf("%10d PrExp @format NUM  :  %d  ; \n", nid, $1 ); }
-    | LPARE AddExp RPARE
-        { $$ = ++ nid; printf("%10d PrExp @format LPARE AddExp RPARE  :  %d  %d  %d  ; \n", nid, $1, $2, $3 ); }
+BType
+    : KEYWORD_INT
+        { $$ = ++ nid; printf("%10d BType @format KEYWORD_INT  :  %d  ; \n", nid, $1 ); }
+    | KEYWORD_FLOAT
+        { $$ = ++ nid; printf("%10d BType @format KEYWORD_FLOAT  :  %d  ; \n", nid, $1 ); }
 ;
 
 
