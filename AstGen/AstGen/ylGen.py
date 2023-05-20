@@ -116,19 +116,26 @@ def __getLexText(lexData, keywordData):
 
     # 处理关键字匹配
     if keywordData != {}:
-        newLine  = IDENTIFIER_PATTERN + r"  { yylval = ++ nid; " + "\n"
+        newLine  = (IDENTIFIER_PATTERN + r"  { yylval = ++ nid; "
+                    + 'printf("%10d ", nid); \n' 
+                    + (' ' * KEYWORD_MATCH_PREFIX_LEN)
+                    + "int typeId = IDENTIFIER; " # 默认类型为标识符
+                    + "\n")
 
         for keyword in keywordData:
             value   = keywordData[keyword]
             lineTmp = ((' ' * KEYWORD_MATCH_PREFIX_LEN) + 'if(0 == strcmp("' 
                 + RND_FLAG_1 
-                + '", yytext)) return ' 
-                + RND_FLAG_2 + '; \n')
+                + '", yytext)) { typeId = ' 
+                + RND_FLAG_2 + '; printf("' + RND_FLAG_2 + '"); }\n')
             lineTmp = lineTmp.replace(RND_FLAG_1, value).replace(RND_FLAG_2, keyword)
             newLine += lineTmp
-
-        # 默认类型为标识符
-        newLine += (' ' * KEYWORD_MATCH_PREFIX_LEN) + "return IDENTIFIER; }" 
+        
+        newLine += ("\n" + (' ' * KEYWORD_MATCH_PREFIX_LEN) 
+                    + 'if(typeId == IDENTIFIER) printf("IDENTIFIER");\n')
+        newLine += ((' ' * KEYWORD_MATCH_PREFIX_LEN) 
+                    + 'printf(" %s : ; \\n", yytext);\n')
+        newLine += (' ' * KEYWORD_MATCH_PREFIX_LEN) + "return typeId; }" 
         text    += newLine + "\n"
 
     return "%%\n" + text + "%%\n"

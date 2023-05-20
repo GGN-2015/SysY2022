@@ -29,7 +29,7 @@ int main() {
 %%
 VarDefine
     : BType IDENTIFIER EQUAL IDENTIFIER
-        { $$ = ++ nid; printf("%10d VarDefine @format BType IDENTIFIER EQUAL IDENTIFIER  :  %d  %d  %d  %d  ; \n", nid, $1, $2, $3, $4 ); }   
+        { $$ = ++ nid; printf("%10d VarDefine @format BType IDENTIFIER EQUAL IDENTIFIER  :  %d  %d  %d  %d  ; \n", nid, $1, $2, $3, $4 ); }
 ;
 
 BType
