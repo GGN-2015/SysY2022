@@ -17,8 +17,7 @@ int yywrap() {
 
 // defined in "y.tab.c"
 void yyerror(const char* s) {
-	printf("[error] %s
-", s);
+	printf("[error] %s\n", s);
 }
 
 int main() {
@@ -29,6 +28,9 @@ int main() {
 
 
 %token SEMICOLON COMMA EQUAL LBRACKET RBRACKET LBRACE RBRACE LPARE RPARE OPE_NOT OPE_ADD OPE_SUB OPE_MUL OPE_DIV OPE_MOD OPE_AND OPE_OR OPE_EQU OPE_NEQ OPE_LEQ OPE_GEQ OPE_LSS OPE_GTR INT_CONST FLOAT_CONST IDENTIFIER KEYWORD_CONST KEYWORD_INT KEYWORD_FLOAT KEYWORD_VOID KEYWORD_IF KEYWORD_ELSE KEYWORD_WHILE KEYWORD_CONTINUE KEYWORD_BREAK KEYWORD_RETURN 
+
+%left KEYWORD_ELSE
+%left KEYWORD_IF
 %%
 CompUnit
     : CompUnitDef 
@@ -125,10 +127,8 @@ FuncDef
 FuncType
     : KEYWORD_VOID 
         { $$ = ++ nid; printf("%10d FuncType @format KEYWORD_VOID  :  %d  ; \n", nid, $1 ); }
-    | KEYWORD_INT 
-        { $$ = ++ nid; printf("%10d FuncType @format KEYWORD_INT  :  %d  ; \n", nid, $1 ); }
-    | KEYWORD_FLOAT 
-        { $$ = ++ nid; printf("%10d FuncType @format KEYWORD_FLOAT  :  %d  ; \n", nid, $1 ); }
+    | BType 
+        { $$ = ++ nid; printf("%10d FuncType @format BType  :  %d  ; \n", nid, $1 ); }
 ;
 
 FuncFParams

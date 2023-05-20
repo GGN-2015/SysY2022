@@ -18,4 +18,5 @@ extern YYSTYPE yylval; // put it before "y.tab.h"
         if(typeId == IDENTIFIER) printf("IDENTIFIER");
         printf(" %s : ; \n", yytext);
         return typeId; }
+[ \t]
 %%

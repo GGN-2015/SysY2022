@@ -35,7 +35,7 @@ int yywrap() {
 
 // defined in "y.tab.c"
 void yyerror(const char* s) {
-	printf("[error] %s\n", s);
+	printf("[error] %s\\n", s);
 }
 
 int main() {
@@ -55,7 +55,7 @@ ${OUT_FILE}: lex.yy.c y.tab.c
 	cc lex.yy.c y.tab.c -o ${OUT_FILE} -ll
 
 y.tab.c: ${YACC_FILE}
-	yacc -d ${YACC_FILE}
+	yacc -d ${YACC_FILE} -Wcounterexamples
 
 lex.yy.c: ${LEX_FILE}
 	lex ${LEX_FILE}

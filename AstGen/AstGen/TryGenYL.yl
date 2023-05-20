@@ -63,8 +63,7 @@
 %syntax FuncDef        := FuncType IDENTIFIER LPARE             RPARE Block
 %syntax FuncDef        := FuncType IDENTIFIER LPARE FuncFParams RPARE Block 
 %syntax FuncType       := KEYWORD_VOID
-%syntax FuncType       := KEYWORD_INT
-%syntax FuncType       := KEYWORD_FLOAT
+%syntax FuncType       := BType
 %syntax FuncFParams    := FuncFParam
 %syntax FuncFParams    := FuncFParams COMMA FuncFParam
 %syntax FuncFParam     := BType IDENTIFIER FuncFParamArrayIndexList
