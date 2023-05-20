@@ -93,7 +93,7 @@ IDENTIFIER               = "IDENTIFIER"
 IDENTIFIER_PATTERN       = "[_a-zA-Z][_a-zA-Z0-9]*"
 
 # 获取词法定义字符串
-def __getLexText(lexData, keywordData):
+def __getLexText(lexData, keywordData, ignore_space=True):
     maxNameLen = max(
         [len(name) for name in lexData] + 
         [len(keyword) for keyword in keywordData] + 
@@ -137,6 +137,10 @@ def __getLexText(lexData, keywordData):
                     + 'printf(" %s : ; \\n", yytext);\n')
         newLine += (' ' * KEYWORD_MATCH_PREFIX_LEN) + "return typeId; }" 
         text    += newLine + "\n"
+
+    # 忽略空白字符
+    if ignore_space:
+        text += "[ \\t]+\n"
 
     return "%%\n" + text + "%%\n"
 
