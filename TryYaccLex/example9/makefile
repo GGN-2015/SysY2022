@@ -8,10 +8,10 @@ ${OUT_FILE}: lex.yy.c y.tab.c
 y.tab.c: ${YACC_FILE}
 	yacc -d ${YACC_FILE}
 
-lex.yy.c: ${INPUT_FILE}
+lex.yy.c: ${LEX_FILE}
 	lex ${LEX_FILE}
 
-run: ${OUTPUT_FILE}
+run: ${OUT_FILE}
 	./${OUT_FILE}
 
 clean:

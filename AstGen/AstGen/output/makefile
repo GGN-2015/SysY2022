@@ -1,6 +1,7 @@
-OUT_FILE=parser
-LEX_FILE=parser.l
-YACC_FILE=parser.y
+
+OUT_FILE=example
+LEX_FILE=example.l
+YACC_FILE=example.y
 
 ${OUT_FILE}: lex.yy.c y.tab.c
 	cc lex.yy.c y.tab.c -o ${OUT_FILE} -ll
@@ -8,10 +9,10 @@ ${OUT_FILE}: lex.yy.c y.tab.c
 y.tab.c: ${YACC_FILE}
 	yacc -d ${YACC_FILE}
 
-lex.yy.c: ${INPUT_FILE}
+lex.yy.c: ${LEX_FILE}
 	lex ${LEX_FILE}
 
-run: ${OUTPUT_FILE}
+run: ${OUT_FILE}
 	./${OUT_FILE}
 
 clean:

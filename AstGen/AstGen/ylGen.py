@@ -1,5 +1,73 @@
 from ylReader import ylReader
 from random import randint
+import os
+
+# lex 文件前缀
+LEX_PREFIX = """
+%{
+#include <stdio.h>
+
+#define YYSTYPE int
+extern int nid;
+extern YYSTYPE yylval; // put it before "y.tab.h"
+
+#include "y.tab.h"
+%}
+"""
+
+# yacc 文件前缀
+YACC_PREFIX = """
+%{
+#include <stdio.h>
+#include <string.h>
+
+#define YYSTYPE int
+extern YYSTYPE yylval;
+int yydebu = 1; // debug
+int nid = 0;
+
+extern int yylex(void);
+extern int yyparse(void);
+
+int yywrap() {
+	return 1;
+}
+
+// defined in "y.tab.c"
+void yyerror(const char* s) {
+	printf("[error] %s\n", s);
+}
+
+int main() {
+	yyparse();
+	return 0;
+}
+%}
+"""
+
+# makefile 文件内容
+MAKEFILE = """
+OUT_FILE=example
+LEX_FILE=example.l
+YACC_FILE=example.y
+
+${OUT_FILE}: lex.yy.c y.tab.c
+	cc lex.yy.c y.tab.c -o ${OUT_FILE} -ll
+
+y.tab.c: ${YACC_FILE}
+	yacc -d ${YACC_FILE}
+
+lex.yy.c: ${LEX_FILE}
+	lex ${LEX_FILE}
+
+run: ${OUT_FILE}
+	./${OUT_FILE}
+
+clean:
+	rm ${OUT_FILE} lex.yy.c y.tab.c y.tab.h
+
+.PHONY: run clean
+"""
 
 # 检查符号名称是否合法，符号名称只能由大写字母和下划线构成
 def __tokenNameCheck(name: str):
@@ -319,7 +387,7 @@ def __test__ylGen():
     """
     (lex, yacc), flag = ylGen(correctText)
     assert flag == ""
-    print(lex, yacc)
+    # print(lex, yacc)
 
     (lex, yacc), flag = ylGen(r"%token num [0-9]+")
     assert flag == "Token Name Unavailable"
@@ -356,5 +424,33 @@ def __test():
 
     print(__file__, "[PASSED]")
 
+DIR_NOW   = os.path.dirname(__file__)
+DIR_OUT   = os.path.join(DIR_NOW, "output")
+
+# 根据输入 yl 文件的要求生成输出文件
+def createOutput(infile):
+    lex_file  = os.path.join(DIR_OUT, "example.l")
+    yacc_file = os.path.join(DIR_OUT, "example.y")
+    makefile  = os.path.join(DIR_OUT, "makefile")
+
+    (lex, yacc), flag = ylGen(open(infile).read())
+    if flag != "":
+        print("[ERROR] " + flag)
+    else:
+        # 生成 LEX 文件
+        with open(lex_file, "w") as f:
+            f.write(LEX_PREFIX + "\n" + lex)
+
+        # 生成 YACC 文件
+        with open(yacc_file, "w") as f:
+            f.write(YACC_PREFIX + "\n" + yacc)
+
+        # 生成 MAKEFILE
+        with open(makefile, "w") as f:
+            f.write(MAKEFILE)
+
 if __name__ == "__main__":
     __test()
+
+    testFile = os.path.join(DIR_NOW, "TryGenYL.yl")
+    createOutput(testFile)
