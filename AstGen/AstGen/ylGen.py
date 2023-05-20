@@ -88,16 +88,49 @@ RND_FLAG_2 = __getRandStr(32) + "_2"
 RND_FLAG_3 = __getRandStr(32) + "_3"
 RND_FLAG_4 = __getRandStr(32) + "_4"
 
+KEYWORD_MATCH_PREFIX_LEN = 8
+IDENTIFIER               = "IDENTIFIER"
+IDENTIFIER_PATTERN       = "[_a-zA-Z][_a-zA-Z0-9]*"
+
 # 获取词法定义字符串
-def __getLexText(lexData):
-    maxNameLen = max([len(name) for name in lexData]) + 1
-    maxRELen   = max([len(lexData[name]) for name in lexData]) + 1
+def __getLexText(lexData, keywordData):
+    maxNameLen = max(
+        [len(name) for name in lexData] + 
+        [len(keyword) for keyword in keywordData] + 
+        [len(IDENTIFIER)]) + 1
+    maxRELen   = max(
+        [len(lexData[name]) for name in lexData] + 
+        [len(IDENTIFIER_PATTERN)]) + 1
+
     text = ""
     for name in lexData:
-        newLine = RND_FLAG_1 + r' { yylval = ++ nid; printf("%10d ' + RND_FLAG_2 + ' %s : ; \\n", nid, yytext); return ' + RND_FLAG_2 + ' ; }'
+        newLine = (RND_FLAG_1 
+            + r' { yylval = ++ nid; printf("%10d ' 
+            + RND_FLAG_2 
+            + ' %s : ; \\n", nid, yytext); return ' 
+            + RND_FLAG_2 
+            + ' ; }')
         newLine = newLine.replace(RND_FLAG_1, __fill(lexData[name], -maxRELen))
         newLine = newLine.replace(RND_FLAG_2, __fill(name,        -maxNameLen))
         text   += newLine + "\n"
+
+    # 处理关键字匹配
+    if keywordData != {}:
+        newLine  = IDENTIFIER_PATTERN + r"  { yylval = ++ nid; " + "\n"
+
+        for keyword in keywordData:
+            value   = keywordData[keyword]
+            lineTmp = ((' ' * KEYWORD_MATCH_PREFIX_LEN) + 'if(0 == strcmp("' 
+                + RND_FLAG_1 
+                + '", yytext)) return ' 
+                + RND_FLAG_2 + '; \n')
+            lineTmp = lineTmp.replace(RND_FLAG_1, value).replace(RND_FLAG_2, keyword)
+            newLine += lineTmp
+
+        # 默认类型为标识符
+        newLine += (' ' * KEYWORD_MATCH_PREFIX_LEN) + "return IDENTIFIER; }" 
+        text    += newLine + "\n"
+
     return "%%\n" + text + "%%\n"
 
 # 为某一个非终极符生成文法规则
@@ -115,6 +148,8 @@ def __genSingleSyntaxText(name, ruleList):
             lineTmp += token + " "
 
         lineNow += lineTmp
+
+        # 为文法输出节点信息
         lineCmd  = ('\n        { $$ = ++ nid; printf("%10d ' 
                     + RND_FLAG_1 
                     + ' @format ' 
@@ -133,9 +168,14 @@ def __genSingleSyntaxText(name, ruleList):
     return text
 
 # 获取语法定义字符串
-def __getYaccText(lexData, yaccData):
+def __getYaccText(lexData, keywordData, yaccData):
     tokenList = "\n%token "
     for name in lexData: tokenList += name + " "
+
+    # 处理关键字匹配
+    if keywordData != {}:
+        tokenList += "IDENTIFIER "
+        for keyword in keywordData: tokenList += keyword + " "
 
     syntaxText = ""
     for name in yaccData:
@@ -144,14 +184,56 @@ def __getYaccText(lexData, yaccData):
     return tokenList + "\n%%\n" + syntaxText + "\n%%\n"
 
 # 检查文法符号是否出现过
-def __checkYaccToken(lexData, yaccData):
+def __checkYaccToken(lexData, keywordData, yaccData):
     for name in yaccData:
         for interp in yaccData[name]:
             for token in interp:
-                if yaccData.get(token) is not None or lexData.get(token) is not None:
+                if (yaccData.get(token) is not None 
+                    or lexData.get(token) is not None
+                    or (keywordData != {} and token == IDENTIFIER)
+                    or (keywordData.get(token) is not None)
+                ):
                     pass
                 else:
                     return "Syntax Uses Undefined Token"
+
+    return ""
+
+# 检查是否是字母数字下划线
+def __checkIdentifierChar(c: str):
+    return c == "_" or c.isdigit() or c.isalpha()
+
+# 检查 Keyword 值的合法性
+def __keywordValueCheck(value):
+    if value == "":
+        return False
+
+    # 检查是否存在非法字符
+    for c in value:
+        if not __checkIdentifierChar(c):
+            return False
+
+    # 检查第一个字符是否合法
+    if value[0].isdigit():
+        return False
+
+    return True
+
+# 增加新的关键字
+def __addKeyword(keywordData, line):
+    name  = line[1]
+    value = line[2]
+
+    if not __tokenNameCheck(name):
+        return "Keyword Name Unavailable"
+
+    if keywordData.get(name) is not None:
+        return "Keyword Name Duplicated"
+
+    if not __keywordValueCheck(value):
+        return "Keyword Value Unavailable"
+
+    keywordData[name] = value
     return ""
 
 # 生成词法定义字符串和，语法定义字符串
@@ -159,8 +241,9 @@ def ylGen(text):
     lis, flag = ylReader(text)
     if flag != "": return ("", ""), flag # ylReader Error
 
-    lexData  = {}
-    yaccData = {}
+    lexData     = {}
+    yaccData    = {}
+    keywordData = {}
     for line in lis:
 
         if line[0] == r"%token":
@@ -169,16 +252,22 @@ def ylGen(text):
         elif line[0] == r"%syntax":
             flag = __addSyntax(yaccData, line)
 
+        elif line[0] == r"%keyword":
+            flag = __addKeyword(keywordData, line)
+
         else:
             flag = "Line Type Error"
 
         if flag != "": return ("", ""), flag # Error Report
 
-    flag = __checkYaccToken(lexData, yaccData)
+    flag = __checkYaccToken(lexData, keywordData, yaccData)
     if flag != "": return ("", ""), flag
 
-    return (__getLexText(lexData), 
-            __getYaccText(lexData, yaccData)), "" # No Error
+    if keywordData != {} and lexData.get(IDENTIFIER) is not None:
+        return ("", ""), "Keyword Mode Should Not Define Token IDENTIFIER"
+
+    return (__getLexText(lexData, keywordData), 
+            __getYaccText(lexData, keywordData, yaccData)), "" # No Error
 
 def __test__ylGen():
     correctText = r"""
@@ -207,6 +296,20 @@ def __test__ylGen():
     assert flag == ""
     # print(lex, yacc)
 
+    correctText = r"""
+        %token EQUAL \=
+
+        %keyword KEYWORD_INT    int
+        %keyword KEYWORD_FLOAT float
+
+        %syntax VarDefine := BType IDENTIFIER EQUAL IDENTIFIER
+        %syntax BType     := KEYWORD_INT
+        %syntax BType     := KEYWORD_FLOAT
+    """
+    (lex, yacc), flag = ylGen(correctText)
+    assert flag == ""
+    print(lex, yacc)
+
     (lex, yacc), flag = ylGen(r"%token num [0-9]+")
     assert flag == "Token Name Unavailable"
 
@@ -221,6 +324,18 @@ def __test__ylGen():
 
     (lex, yacc), flag = ylGen(r"%syntax AddExp := NUM")
     assert flag == "Syntax Uses Undefined Token"
+
+    (lex, yacc), flag = ylGen(r"%keyword abc int")
+    assert flag == "Keyword Name Unavailable"
+
+    (lex, yacc), flag = ylGen("%keyword KEY_INT int\n%keyword KEY_INT int")
+    assert flag == "Keyword Name Duplicated"
+
+    (lex, yacc), flag = ylGen("%keyword KEY_INT int\n%keyword KEY_FLOAT 3int")
+    assert flag == "Keyword Value Unavailable"
+
+    (lex, yacc), flag = ylGen("%keyword KEY_INT int\n%token IDENTIFIER test")
+    assert flag == "Keyword Mode Should Not Define Token IDENTIFIER"
 
 # 自动化测试
 def __test():
