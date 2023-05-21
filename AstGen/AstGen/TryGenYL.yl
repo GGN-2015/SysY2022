@@ -81,8 +81,8 @@
 
 %syntax Stmt           := NonIfStmt
 %syntax Stmt           := IfStmt
-%syntax IfStmt         := KEYWORD_IF LPARE Cond RPARE Stmt
 %syntax IfStmt         := KEYWORD_IF LPARE Cond RPARE NonIfStmt KEYWORD_ELSE Stmt
+%syntax IfStmt         := KEYWORD_IF LPARE Cond RPARE Stmt
 
 %syntax NonIfStmt      := LVal EQUAL Exp SEMICOLON
 %syntax NonIfStmt      := Block
