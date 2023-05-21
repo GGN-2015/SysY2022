@@ -79,15 +79,18 @@
 %syntax BlockItem      := Decl
 %syntax BlockItem      := Stmt
 
-%syntax Stmt           := LVal EQUAL Exp SEMICOLON
-%syntax Stmt           := Block
-%syntax Stmt           := KEYWORD_IF           LPARE Cond RPARE Stmt
-%syntax Stmt           := KEYWORD_IF           LPARE Cond RPARE Stmt KEYWORD_ELSE Stmt
-%syntax Stmt           := KEYWORD_WHILE        LPARE Cond RPARE Stmt
-%syntax Stmt           := KEYWORD_BREAK        SEMICOLON
-%syntax Stmt           := KEYWORD_CONTINUE     SEMICOLON
-%syntax Stmt           := KEYWORD_RETURN       SEMICOLON
-%syntax Stmt           := KEYWORD_RETURN   Exp SEMICOLON
+%syntax Stmt           := NonIfStmt
+%syntax Stmt           := IfStmt
+%syntax IfStmt         := KEYWORD_IF LPARE Cond RPARE Stmt
+%syntax IfStmt         := KEYWORD_IF LPARE Cond RPARE NonIfStmt KEYWORD_ELSE Stmt
+
+%syntax NonIfStmt      := LVal EQUAL Exp SEMICOLON
+%syntax NonIfStmt      := Block
+%syntax NonIfStmt      := KEYWORD_WHILE        LPARE Cond RPARE Stmt
+%syntax NonIfStmt      := KEYWORD_BREAK        SEMICOLON
+%syntax NonIfStmt      := KEYWORD_CONTINUE     SEMICOLON
+%syntax NonIfStmt      := KEYWORD_RETURN       SEMICOLON
+%syntax NonIfStmt      := KEYWORD_RETURN   Exp SEMICOLON
 
 %syntax Exp            := AddExp
 %syntax Cond           := LOrExp
