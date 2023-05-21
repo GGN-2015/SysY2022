@@ -38,7 +38,10 @@ def ylReader(text):
         line = line.strip()
         if line == "": continue # jump empty line
 
-        if __matchPre(line, r"%token "):
+        if line[0] == "#": # this is a comment
+            pass
+
+        elif __matchPre(line, r"%token "):
             lis = __parseToken(line)
             ans.append(lis)
             if len(lis) != TOKEN_DEFINE_LEN:

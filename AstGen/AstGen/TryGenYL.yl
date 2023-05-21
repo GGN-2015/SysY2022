@@ -37,8 +37,10 @@
 %token OPE_LSS     "<"
 %token OPE_GTR     ">"
 
-%token INT_CONST   [0-9][0-9]*
-%token FLOAT_CONST [0-9][0-9]*\.[0-9]*
+%token DECIMAL_CONST     [1-9][0-9]*
+%token OCTAL_CONST       [0][0-7]*
+%token HEXADECIMAL_CONST 0[xX][0-9A-F][0-9A-F]*
+%token FLOAT_CONST       [0-9][0-9]*\.[0-9]*
 
 %syntax CompUnit       := CompUnitDef
 %syntax CompUnit       := CompUnit CompUnitDef
@@ -91,14 +93,21 @@
 %syntax Stmt           := KEYWORD_RETURN       SEMICOLON
 %syntax Stmt           := KEYWORD_RETURN   Exp SEMICOLON
 
+%syntax IntConst       := DECIMAL_CONST
+%syntax IntConst       := OCTAL_CONST
+%syntax IntConst       := HEXADECIMAL_CONST
+
+# the syntax of float is not finished yet
+%syntax FloatConst     := FLOAT_CONST
+
 %syntax Exp            := AddExp
 %syntax Cond           := LOrExp
 %syntax LVal           := IDENTIFIER ArrayIndexList
 %syntax PrimaryExp     := LPARE Exp RPARE
 %syntax PrimaryExp     := LVal
 %syntax PrimaryExp     := Number
-%syntax Number         := INT_CONST
-%syntax Number         := FLOAT_CONST
+%syntax Number         := IntConst
+%syntax Number         := FloatConst
 %syntax UnaryExp       := PrimaryExp
 %syntax UnaryExp       := IDENTIFIER LPARE             RPARE
 %syntax UnaryExp       := IDENTIFIER LPARE FuncRPAREms RPARE
