@@ -57,7 +57,7 @@ ${OUT_FILE}: lex.yy.c y.tab.c
 	cc lex.yy.c y.tab.c -o ${OUT_FILE} -ll
 
 y.tab.c: ${YACC_FILE}
-	yacc -d ${YACC_FILE} -Wcounterexamples
+	yacc -d ${YACC_FILE}
 
 lex.yy.c: ${LEX_FILE}
 	lex ${LEX_FILE}
