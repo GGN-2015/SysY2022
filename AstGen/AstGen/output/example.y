@@ -1,3 +1,4 @@
+
 %{
 #include <stdio.h>
 #include <string.h>
@@ -6,6 +7,7 @@
 extern YYSTYPE yylval;
 int yydebu = 1; // debug
 int nid = 0;
+int lineId = 1;
 
 extern int yylex(void);
 extern int yyparse(void);
@@ -16,7 +18,7 @@ int yywrap() {
 
 // defined in "y.tab.c"
 void yyerror(const char* s) {
-	printf("[error] %s\n", s);
+	printf("[error] %s on line %d\n", s, lineId);
 }
 
 int main() {
@@ -24,7 +26,9 @@ int main() {
 	return 0;
 }
 %}
-%token KEYWORD_INT_FUNC KEYWORD_FLOAT_FUNC SEMICOLON COMMA EQUAL LBRACKET RBRACKET LBRACE RBRACE LPARE RPARE OPE_NOT OPE_ADD OPE_SUB OPE_MUL OPE_DIV OPE_MOD OPE_AND OPE_OR OPE_EQU OPE_NEQ OPE_LEQ OPE_GEQ OPE_LSS OPE_GTR INT_CONST FLOAT_CONST IDENTIFIER KEYWORD_CONST KEYWORD_INT KEYWORD_FLOAT KEYWORD_VOID KEYWORD_IF KEYWORD_ELSE KEYWORD_WHILE KEYWORD_CONTINUE KEYWORD_BREAK KEYWORD_RETURN 
+
+
+%token KEYWORD_INT_FUNC KEYWORD_FLOAT_FUNC SEMICOLON COMMA EQUAL LBRACKET RBRACKET LBRACE RBRACE LPARE RPARE OPE_NOT OPE_ADD OPE_SUB OPE_MUL OPE_DIV OPE_MOD OPE_AND OPE_OR OPE_EQU OPE_NEQ OPE_LEQ OPE_GEQ OPE_LSS OPE_GTR DECIMAL_CONST OCTAL_CONST HEXADECIMAL_CONST FLOAT_CONST IDENTIFIER KEYWORD_CONST KEYWORD_INT KEYWORD_FLOAT KEYWORD_VOID KEYWORD_IF KEYWORD_ELSE KEYWORD_WHILE KEYWORD_CONTINUE KEYWORD_BREAK KEYWORD_RETURN 
 %%
 CompUnit
     : CompUnitDef 
@@ -168,6 +172,10 @@ BlockItem
 Stmt
     : LVal EQUAL Exp SEMICOLON 
         { $$ = ++ nid; printf("%10d Stmt @format LVal EQUAL Exp SEMICOLON  :  %d  %d  %d  %d  ; \n", nid, $1, $2, $3, $4 ); }
+    | SEMICOLON 
+        { $$ = ++ nid; printf("%10d Stmt @format SEMICOLON  :  %d  ; \n", nid, $1 ); }
+    | Exp SEMICOLON 
+        { $$ = ++ nid; printf("%10d Stmt @format Exp SEMICOLON  :  %d  %d  ; \n", nid, $1, $2 ); }
     | Block 
         { $$ = ++ nid; printf("%10d Stmt @format Block  :  %d  ; \n", nid, $1 ); }
     | KEYWORD_IF LPARE Cond RPARE Stmt 
@@ -184,6 +192,20 @@ Stmt
         { $$ = ++ nid; printf("%10d Stmt @format KEYWORD_RETURN SEMICOLON  :  %d  %d  ; \n", nid, $1, $2 ); }
     | KEYWORD_RETURN Exp SEMICOLON 
         { $$ = ++ nid; printf("%10d Stmt @format KEYWORD_RETURN Exp SEMICOLON  :  %d  %d  %d  ; \n", nid, $1, $2, $3 ); }
+;
+
+IntConst
+    : DECIMAL_CONST 
+        { $$ = ++ nid; printf("%10d IntConst @format DECIMAL_CONST  :  %d  ; \n", nid, $1 ); }
+    | OCTAL_CONST 
+        { $$ = ++ nid; printf("%10d IntConst @format OCTAL_CONST  :  %d  ; \n", nid, $1 ); }
+    | HEXADECIMAL_CONST 
+        { $$ = ++ nid; printf("%10d IntConst @format HEXADECIMAL_CONST  :  %d  ; \n", nid, $1 ); }
+;
+
+FloatConst
+    : FLOAT_CONST 
+        { $$ = ++ nid; printf("%10d FloatConst @format FLOAT_CONST  :  %d  ; \n", nid, $1 ); }
 ;
 
 Exp
@@ -211,10 +233,10 @@ PrimaryExp
 ;
 
 Number
-    : INT_CONST 
-        { $$ = ++ nid; printf("%10d Number @format INT_CONST  :  %d  ; \n", nid, $1 ); }
-    | FLOAT_CONST 
-        { $$ = ++ nid; printf("%10d Number @format FLOAT_CONST  :  %d  ; \n", nid, $1 ); }
+    : IntConst 
+        { $$ = ++ nid; printf("%10d Number @format IntConst  :  %d  ; \n", nid, $1 ); }
+    | FloatConst 
+        { $$ = ++ nid; printf("%10d Number @format FloatConst  :  %d  ; \n", nid, $1 ); }
 ;
 
 UnaryExp

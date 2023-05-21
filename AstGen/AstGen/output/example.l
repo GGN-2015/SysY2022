@@ -4,6 +4,7 @@
 
 #define YYSTYPE int
 extern int nid;
+extern int lineId;
 extern YYSTYPE yylval; // put it before "y.tab.h"
 
 #include "y.tab.h"
@@ -35,7 +36,9 @@ float/[ \t]*[_a-zA-z0-9]+\(  { yylval = ++ nid; printf("%10d KEYWORD_FLOAT_FUNC 
 ">="                         { yylval = ++ nid; printf("%10d OPE_GEQ             %s : ; \n", nid, yytext); return OPE_GEQ             ; }
 "<"                          { yylval = ++ nid; printf("%10d OPE_LSS             %s : ; \n", nid, yytext); return OPE_LSS             ; }
 ">"                          { yylval = ++ nid; printf("%10d OPE_GTR             %s : ; \n", nid, yytext); return OPE_GTR             ; }
-[0-9][0-9]*                  { yylval = ++ nid; printf("%10d INT_CONST           %s : ; \n", nid, yytext); return INT_CONST           ; }
+[1-9][0-9]*                  { yylval = ++ nid; printf("%10d DECIMAL_CONST       %s : ; \n", nid, yytext); return DECIMAL_CONST       ; }
+[0][0-7]*                    { yylval = ++ nid; printf("%10d OCTAL_CONST         %s : ; \n", nid, yytext); return OCTAL_CONST         ; }
+0[xX][0-9A-F][0-9A-F]*       { yylval = ++ nid; printf("%10d HEXADECIMAL_CONST   %s : ; \n", nid, yytext); return HEXADECIMAL_CONST   ; }
 [0-9][0-9]*\.[0-9]*          { yylval = ++ nid; printf("%10d FLOAT_CONST         %s : ; \n", nid, yytext); return FLOAT_CONST         ; }
 [_a-zA-Z][_a-zA-Z0-9]*  { yylval = ++ nid; printf("%10d ", nid); 
         int typeId = IDENTIFIER; 
@@ -54,4 +57,5 @@ float/[ \t]*[_a-zA-z0-9]+\(  { yylval = ++ nid; printf("%10d KEYWORD_FLOAT_FUNC 
         printf(" %s : ; \n", yytext);
         return typeId; }
 [ \t]+
+\n { lineId += 1; } /* new line */ 
 %%
