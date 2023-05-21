@@ -9,6 +9,7 @@ LEX_PREFIX = """
 
 #define YYSTYPE int
 extern int nid;
+extern int lineId;
 extern YYSTYPE yylval; // put it before "y.tab.h"
 
 #include "y.tab.h"
@@ -25,6 +26,7 @@ YACC_PREFIX = """
 extern YYSTYPE yylval;
 int yydebu = 1; // debug
 int nid = 0;
+int lineId = 1;
 
 extern int yylex(void);
 extern int yyparse(void);
@@ -35,7 +37,7 @@ int yywrap() {
 
 // defined in "y.tab.c"
 void yyerror(const char* s) {
-	printf("[error] %s\\n", s);
+	printf("[error] %s on line %d\\n", s, lineId);
 }
 
 int main() {
@@ -209,6 +211,8 @@ def __getLexText(lexData, keywordData, ignore_space=True):
     # 忽略空白字符
     if ignore_space:
         text += "[ \\t]+\n"
+
+    text += "\\n { lineId += 1; } /* new line */ \n"
 
     return "%%\n" + text + "%%\n"
 
