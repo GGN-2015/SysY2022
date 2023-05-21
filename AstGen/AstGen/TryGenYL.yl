@@ -80,6 +80,7 @@
 %syntax BlockItem      := Stmt
 
 %syntax Stmt           := LVal EQUAL Exp SEMICOLON
+%syntax Stmt           := Exp SEMICOLON
 %syntax Stmt           := Block
 %syntax Stmt           := KEYWORD_IF           LPARE Cond RPARE Stmt
 %syntax Stmt           := KEYWORD_IF           LPARE Cond RPARE Stmt KEYWORD_ELSE Stmt
